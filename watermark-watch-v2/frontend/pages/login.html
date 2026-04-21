@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Login — WatermarkWatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/global.css"/>
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .auth-wrap {
+      flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px;
+      background: radial-gradient(ellipse 700px 500px at 50% 0%, rgba(0,229,160,0.04) 0%, transparent 70%);
+    }
+    .auth-card {
+      width: 100%; max-width: 420px;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-xl);
+      padding: 40px 36px;
+    }
+    .auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
+    .auth-logo span { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
+    h1 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .auth-sub { font-size: 14px; color: var(--text2); margin-bottom: 28px; }
+    .form { display: flex; flex-direction: column; gap: 16px; }
+    .auth-footer { margin-top: 24px; text-align: center; font-size: 13px; color: var(--text3); }
+    .auth-footer a { color: var(--accent); }
+    .alert { padding: 11px 14px; border-radius: var(--radius); font-size: 13px; margin-bottom: 4px; }
+    .alert-error { background: var(--rdim); border: 1px solid rgba(255,77,77,0.2); color: var(--red); }
+  </style>
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon">
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/>
+            <path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span>WatermarkWatch</span>
+      </div>
+
+      <h1>Welcome back</h1>
+      <p class="auth-sub">Sign in to your account to continue</p>
+
+      <div id="alertBox" class="alert alert-error hidden"></div>
+
+      <div class="form">
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input class="form-input" type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password"/>
+        </div>
+        <button class="btn btn-primary btn-full" id="loginBtn" onclick="doLogin()">
+          <span id="loginLabel">Sign in</span>
+          <svg id="loginSpin" class="spin hidden" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="5.5" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+            <path d="M7 1.5A5.5 5.5 0 0112.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="register.html">Create one free</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <script src="../src/utils.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+
+    // Allow Enter key
+    document.getElementById('password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    async function doLogin() {
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = document.getElementById('loginBtn');
+      const label    = document.getElementById('loginLabel');
+      const spin     = document.getElementById('loginSpin');
+      const alert    = document.getElementById('alertBox');
+
+      alert.classList.add('hidden');
+      if (!email || !password) {
+        showAlert('Please enter your email and password.');
+        return;
+      }
+
+      btn.disabled = true;
+      label.textContent = 'Signing in...';
+      spin.classList.remove('hidden');
+
+      try {
+        const data = await apiFetch('/api/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+        Auth.setSession(data.token, data.user);
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        showAlert(err.message);
+        btn.disabled = false;
+        label.textContent = 'Sign in';
+        spin.classList.add('hidden');
+      }
+    }
+
+    function showAlert(msg) {
+      const el = document.getElementById('alertBox');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

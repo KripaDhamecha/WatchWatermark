@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090B;--bg2:#111114;--bg3:#18181C;--bg4:#1F1F24;--bg5:#27272D;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--border3:rgba(255,255,255,0.2);
+  --text:#F2F1EB;--text2:#8B8B97;--text3:#4E4E59;
+  --accent:#00E5A0;--accent2:#00ffb3;
+  --adim:rgba(0,229,160,0.13);--adim2:rgba(0,229,160,0.06);--adim3:rgba(0,229,160,0.03);
+  --red:#FF4D4D;--rdim:rgba(255,77,77,0.13);
+  --amber:#F5A623;--ydim:rgba(245,166,35,0.13);
+  --blue:#4DA6FF;--bdim:rgba(77,166,255,0.13);
+  --r:10px;--rl:16px;--rxl:22px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+
+/* ── Loader ─────────────────────────────── */
+#loader{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+  transition:opacity 0.5s ease, visibility 0.5s ease;
+}
+#loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.loader-logo{display:flex;align-items:center;gap:12px;font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.02em}
+.loader-icon{width:40px;height:40px;border-radius:10px;background:var(--adim);border:1px solid rgba(0,229,160,0.25);display:flex;align-items:center;justify-content:center}
+.loader-track{width:280px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.loader-fill{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width 0.08s linear;box-shadow:0 0 10px var(--accent)}
+.loader-pct{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.06em}
+.loader-msg{font-size:13px;color:var(--text2);height:18px;transition:opacity 0.3s}
+
+/* ── Nav ─────────────────────────────────── */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;background:rgba(9,9,11,0.88);backdrop-filter:blur(16px)}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-0.01em}
+.logo-icon{width:30px;height:30px;border-radius:8px;background:var(--adim);border:1px solid rgba(0,229,160,0.22);display:flex;align-items:center;justify-content:center}
+
+/* ── Buttons ─────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:9px 18px;border-radius:var(--r);cursor:pointer;border:none;transition:all 0.18s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:var(--accent2)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);background:var(--bg3)}
+.btn-danger{background:var(--rdim);color:var(--red);border:1px solid rgba(255,77,77,0.2)}
+.btn-danger:hover{background:rgba(255,77,77,0.22)}
+.btn-sm{padding:6px 13px;font-size:12px}
+.btn-full{width:100%;justify-content:center;padding:13px;font-size:14px}
+
+/* ── Forms ───────────────────────────────── */
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:12px;color:var(--text2);letter-spacing:.02em}
+.form-input{background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:11px 14px;border-radius:var(--r);outline:none;transition:border-color .2s;width:100%}
+.form-input::placeholder{color:var(--text3)}
+.form-input:focus{border-color:var(--accent)}
+.form-hint{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* ── Sidebar layout ──────────────────────── */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:4px 8px 20px}
+.sidebar-logo span{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r);font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;text-decoration:none}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--adim);color:var(--accent)}
+.sidebar-bottom{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--r);background:var(--bg3)}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--adim);border:1px solid rgba(0,229,160,0.22);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:var(--accent);flex-shrink:0;overflow:hidden;background-size:cover;background-position:center}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-plan{font-size:11px;color:var(--text3)}
+.main{padding:32px 36px;overflow-x:hidden}
+.page-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--text2);margin-bottom:28px}
+
+/* ── Cards & Badges ──────────────────────── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:24px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 9px;border-radius:20px}
+.badge-found  {background:var(--rdim);border:1px solid rgba(255,77,77,0.2);color:var(--red)}
+.badge-clean  {background:var(--adim);border:1px solid rgba(0,229,160,0.2);color:var(--accent)}
+.badge-warn   {background:var(--ydim);border:1px solid rgba(245,166,35,0.2);color:var(--amber)}
+.badge-neutral{background:var(--bg4);border:1px solid var(--border2);color:var(--text3)}
+
+/* ── Toast ───────────────────────────────── */
+.toast{position:fixed;bottom:24px;right:24px;z-index:9998;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);padding:12px 18px;font-size:13px;color:var(--text);opacity:0;transform:translateY(8px);transition:all .25s;max-width:320px;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.toast-error{border-color:rgba(255,77,77,.3);color:var(--red)}
+.toast-ok   {border-color:rgba(0,229,160,.3);color:var(--accent)}
+
+/* ── Spinner ─────────────────────────────── */
+.spin{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Alert boxes ─────────────────────────── */
+.alert{padding:11px 14px;border-radius:var(--r);font-size:13px}
+.alert-error  {background:var(--rdim);border:1px solid rgba(255,77,77,.2);color:var(--red)}
+.alert-success{background:var(--adim);border:1px solid rgba(0,229,160,.2);color:var(--accent)}
+
+/* ── Utils ───────────────────────────────── */
+.hidden{display:none!important}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.four-col{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.mt-1{margin-top:8px}.mt-2{margin-top:16px}.mt-3{margin-top:24px}

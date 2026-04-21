@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Profile — WatermarkWatch</title>
+<link rel="stylesheet" href="../src/global.css"/>
+<style>
+.main{padding:32px 36px;max-width:700px}
+.profile-hero{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:28px;margin-bottom:16px}
+/* Avatar */
+.avatar-section{display:flex;align-items:center;gap:24px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.avatar-wrap{position:relative;width:80px;height:80px;flex-shrink:0}
+.avatar-img{width:80px;height:80px;border-radius:50%;background:var(--adim);border:2px solid rgba(0,229,160,.25);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);overflow:hidden;cursor:pointer;transition:opacity .2s;background-size:cover;background-position:center}
+.avatar-img:hover{opacity:.85}
+.avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;cursor:pointer;pointer-events:none}
+.avatar-wrap:hover .avatar-overlay{opacity:1;pointer-events:auto}
+.avatar-info h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.avatar-info p{font-size:13px;color:var(--text2);margin-bottom:12px}
+.avatar-btns{display:flex;gap:8px;flex-wrap:wrap}
+/* Avatar picker modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rxl);padding:28px;width:100%;max-width:440px}
+.modal h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
+.modal p{font-size:13px;color:var(--text2);margin-bottom:20px}
+.avatar-tabs{display:flex;gap:4px;background:var(--bg3);border-radius:var(--r);padding:4px;margin-bottom:20px}
+.avatar-tab{flex:1;text-align:center;padding:7px;border-radius:8px;font-size:12px;cursor:pointer;color:var(--text2);transition:all .15s}
+.avatar-tab.active{background:var(--bg2);color:var(--text);font-weight:500}
+.avatar-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+.av-opt{width:44px;height:44px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .15s;background:var(--bg3)}
+.av-opt:hover{border-color:var(--accent);transform:scale(1.1)}
+.av-opt.selected{border-color:var(--accent);box-shadow:0 0 0 3px var(--adim)}
+.upload-area{border:1.5px dashed var(--border2);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;transition:all .2s}
+.upload-area:hover{border-color:var(--accent);background:var(--adim2)}
+.upload-area p{font-size:13px;color:var(--text2);margin-top:8px}
+/* Profile fields */
+.section-h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em;margin-bottom:16px}
+.fields-form{display:flex;flex-direction:column;gap:14px}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.section-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:24px;margin-bottom:16px}
+.pw-form{display:flex;flex-direction:column;gap:14px}
+.danger-zone{background:var(--bg2);border:1px solid rgba(255,77,77,.2);border-radius:var(--rl);padding:24px}
+.danger-zone p{font-size:13px;color:var(--text2);margin-bottom:14px}
+.info-display{background:var(--bg3);border-radius:var(--r);padding:14px 16px;display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.info-display svg{flex-shrink:0;margin-top:2px;color:var(--accent)}
+.info-display div{font-size:13px;color:var(--text2);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/><path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>WatermarkWatch</span></div>
+    <a href="dashboard.html" class="nav-item"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+    <a href="detector.html" class="nav-item"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/><circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 1.5v2M7.5 11.5v2M1.5 7.5h2M11.5 7.5h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Scan Image</a>
+    <a href="account.html" class="nav-item active"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 13c0-3.038 2.462-5.5 5.5-5.5S13 9.962 13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Profile</a>
+    <div class="sidebar-bottom">
+      <div class="user-card"><div class="user-avatar" id="sideAvatar">?</div><div class="user-info"><div class="user-name" id="sideUsername">…</div><div class="user-plan" id="sidePlan">unlimited</div></div></div>
+      <button class="nav-item mt-1" style="color:var(--text3)" onclick="logout()"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 13H2a1 1 0 01-1-1V3a1 1 0 011-1h3M10 10l3-3-3-3M14 7.5H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-title">Profile</div>
+    <p class="page-sub">Manage your account, avatar, and security settings</p>
+
+    <!-- PROFILE HERO -->
+    <div class="profile-hero">
+      <div class="avatar-section">
+        <div class="avatar-wrap">
+          <div class="avatar-img" id="avatarDisplay" onclick="openAvatarModal()">?</div>
+          <div class="avatar-overlay" onclick="openAvatarModal()">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M13 3l2 2-9 9H4v-2L13 3z" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="avatar-info">
+          <h3 id="profileName">—</h3>
+          <p id="profileEmail">—</p>
+          <div class="avatar-btns">
+            <button class="btn btn-ghost btn-sm" onclick="openAvatarModal()">Change avatar</button>
+            <button class="btn btn-danger btn-sm" id="removeAvatarBtn" onclick="removeAvatar()" style="display:none">Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit profile fields -->
+      <div class="section-h3">Personal info</div>
+      <div id="profileAlert" class="alert hidden" style="margin-bottom:14px"></div>
+      <div class="fields-form">
+        <div class="info-row">
+          <div class="form-group"><label class="form-label">Full name</label><input class="form-input" type="text" id="editFullName" placeholder="Your full name"/></div>
+          <div class="form-group"><label class="form-label">Username</label><input class="form-input" type="text" id="editUsername" disabled style="opacity:.5;cursor:not-allowed"/></div>
+        </div>
+        <div class="form-group"><label class="form-label">Bio</label><input class="form-input" type="text" id="editBio" placeholder="A short bio about yourself..."/></div>
+        <div class="info-row">
+          <div class="form-group"><label class="form-label">Phone (recovery)</label><input class="form-input" type="tel" id="editPhone"/></div>
+          <div class="form-group"><label class="form-label">Birthday (recovery)</label><input class="form-input" type="date" id="editBirthday"/></div>
+        </div>
+        <div>
+          <button class="btn btn-primary" id="saveBtn" onclick="saveProfile()">
+            <span id="saveLabel">Save changes</span>
+            <svg id="saveSpin" class="spin hidden" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/><path d="M7 1.5A5.5 5.5 0 0112.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account info -->
+    <div class="section-card">
+      <div class="section-h3">Account info</div>
+      <div class="info-display">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.3"/><path d="M5 8l2.5 2.5 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div>Plan: <strong style="color:var(--accent)" id="planLabel">Unlimited</strong> · <span id="memberSince">—</span> · <span id="scanCount">—</span> total scans</div>
+      </div>
+    </div>
+
+    <!-- Change password -->
+    <div class="section-card">
+      <div class="section-h3">Change password</div>
+      <div id="pwAlert" class="alert hidden" style="margin-bottom:14px"></div>
+      <div class="pw-form">
+        <div class="form-group"><label class="form-label">Current password</label><input class="form-input" type="password" id="oldPw" placeholder="Enter current password"/></div>
+        <div class="info-row">
+          <div class="form-group"><label class="form-label">New password</label><input class="form-input" type="password" id="newPw" placeholder="Min. 8 characters"/></div>
+          <div class="form-group"><label class="form-label">Confirm new password</label><input class="form-input" type="password" id="confirmPw" placeholder="Repeat"/></div>
+        </div>
+        <div><button class="btn btn-primary" id="pwBtn" onclick="changePw()"><span id="pwLabel">Update password</span><svg id="pwSpin" class="spin hidden" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/><path d="M7 1.5A5.5 5.5 0 0112.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>
+      </div>
+    </div>
+
+    <!-- Danger zone -->
+    <div class="danger-zone">
+      <div class="section-h3" style="color:var(--red)">Sign out</div>
+      <p>This will end your current session. Your data and scan history will be preserved.</p>
+      <button class="btn btn-danger" onclick="logout()">Sign out</button>
+    </div>
+  </main>
+</div>
+
+<!-- AVATAR MODAL -->
+<div class="modal-backdrop hidden" id="avatarModal">
+  <div class="modal">
+    <h3>Choose your avatar</h3>
+    <p>Pick an emoji avatar or upload your own photo</p>
+    <div class="avatar-tabs">
+      <div class="avatar-tab active" id="tabEmoji" onclick="switchTab('emoji')">Emoji avatars</div>
+      <div class="avatar-tab" id="tabPhoto" onclick="switchTab('photo')">Upload photo</div>
+    </div>
+
+    <!-- Emoji tab -->
+    <div id="emojiTab">
+      <div class="avatar-grid" id="emojiGrid"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost btn-sm" onclick="closeAvatarModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveEmojiAvatar()">Save avatar</button>
+      </div>
+    </div>
+
+    <!-- Photo upload tab -->
+    <div id="photoTab" class="hidden">
+      <div class="upload-area" id="photoUploadArea" onclick="document.getElementById('avatarFileInput').click()">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" style="margin:0 auto"><path d="M14 4v14M8 10l6-6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4 20v2a2 2 0 002 2h16a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <p>Click to choose a photo · Max 2MB · JPG or PNG</p>
+      </div>
+      <input type="file" id="avatarFileInput" accept="image/jpeg,image/png,image/webp" hidden/>
+      <div id="photoPreviewWrap" class="hidden" style="text-align:center;margin-top:14px">
+        <img id="photoPreview" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)" src=""/>
+        <p style="font-size:12px;color:var(--text2);margin-top:8px">Preview</p>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+        <button class="btn btn-ghost btn-sm" onclick="closeAvatarModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="uploadPhotoBtn" onclick="uploadPhotoAvatar()" disabled>Upload photo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="../src/utils.js"></script>
+<script>
+if(!Auth.requireAuth()) throw 0;
+
+const EMOJIS=['⚡','🏆','🎯','🔥','🌟','🦁','🐺','🦅','🏋','⚽','🏀','🎾','🏈','🎱','🥊','🎮','🚀','👾','🤖','💎','🌈','🎭','🎪','🦋','🐉','🌊'];
+let selectedEmoji = null;
+let photoDataUrl  = null;
+
+async function init(){
+  try{
+    const u=await apiFetch('/api/auth/me');
+    Auth.setSession(Auth.getToken(),u);
+    initSidebar();
+    // Avatar display
+    const av=document.getElementById('avatarDisplay');
+    if(u.avatar){av.style.backgroundImage=`url('${u.avatar}')`;av.style.backgroundSize='cover';av.textContent='';document.getElementById('removeAvatarBtn').style.display=''}
+    else av.textContent=(u.username||'?')[0].toUpperCase();
+    // Fields
+    document.getElementById('profileName').textContent=u.full_name||u.username;
+    document.getElementById('profileEmail').textContent=u.email;
+    document.getElementById('editFullName').value=u.full_name||'';
+    document.getElementById('editUsername').value=u.username||'';
+    document.getElementById('editBio').value=u.bio||'';
+    document.getElementById('editPhone').value=u.phone||'';
+    document.getElementById('editBirthday').value=u.birthday||'';
+    document.getElementById('planLabel').textContent=u.plan;
+    document.getElementById('memberSince').textContent='Member since '+u.member_since;
+    document.getElementById('scanCount').textContent=u.scans_used;
+  }catch(e){toast(e.message,'error')}
+}
+
+// ── Profile save ──
+async function saveProfile(){
+  const btn=document.getElementById('saveBtn');const lbl=document.getElementById('saveLabel');const spn=document.getElementById('saveSpin');
+  document.getElementById('profileAlert').classList.add('hidden');
+  btn.disabled=true;lbl.textContent='Saving...';spn.classList.remove('hidden');
+  try{
+    const u=await apiFetch('/api/profile',{method:'PATCH',body:JSON.stringify({
+      full_name:document.getElementById('editFullName').value.trim(),
+      bio:document.getElementById('editBio').value.trim(),
+      phone:document.getElementById('editPhone').value.trim(),
+      birthday:document.getElementById('editBirthday').value,
+    })});
+    Auth.setSession(Auth.getToken(),u);
+    document.getElementById('profileName').textContent=u.full_name||u.username;
+    initSidebar();
+    toast('Profile saved!','ok');
+  }catch(e){
+    const al=document.getElementById('profileAlert');al.textContent=e.message;al.className='alert alert-error';al.classList.remove('hidden');
+  }finally{btn.disabled=false;lbl.textContent='Save changes';spn.classList.add('hidden')}
+}
+
+// ── Password ──
+async function changePw(){
+  const btn=document.getElementById('pwBtn');const lbl=document.getElementById('pwLabel');const spn=document.getElementById('pwSpin');
+  const oldPw=document.getElementById('oldPw').value;const np=document.getElementById('newPw').value;const cp=document.getElementById('confirmPw').value;
+  const al=document.getElementById('pwAlert');al.classList.add('hidden');
+  if(!oldPw||!np||!cp) return showPwAlert('All fields required.','error');
+  if(np!==cp) return showPwAlert('Passwords do not match.','error');
+  if(np.length<8) return showPwAlert('Min 8 characters.','error');
+  btn.disabled=true;lbl.textContent='Updating...';spn.classList.remove('hidden');
+  try{
+    await apiFetch('/api/auth/change-password',{method:'POST',body:JSON.stringify({old_password:oldPw,new_password:np})});
+    showPwAlert('Password updated!','success');
+    document.getElementById('oldPw').value='';document.getElementById('newPw').value='';document.getElementById('confirmPw').value='';
+  }catch(e){showPwAlert(e.message,'error')}
+  finally{btn.disabled=false;lbl.textContent='Update password';spn.classList.add('hidden')}
+}
+function showPwAlert(m,t){const el=document.getElementById('pwAlert');el.textContent=m;el.className='alert alert-'+t;el.classList.remove('hidden')}
+
+// ── Avatar modal ──
+function openAvatarModal(){
+  // Build emoji grid
+  const grid=document.getElementById('emojiGrid');
+  grid.innerHTML=EMOJIS.map((e,i)=>`<div class="av-opt" id="avopt-${i}" onclick="selectEmoji('${e}',${i})">${e}</div>`).join('');
+  document.getElementById('avatarModal').classList.remove('hidden');
+}
+function closeAvatarModal(){document.getElementById('avatarModal').classList.add('hidden');selectedEmoji=null;photoDataUrl=null;document.getElementById('photoPreviewWrap').classList.add('hidden');document.getElementById('uploadPhotoBtn').disabled=true}
+function switchTab(t){
+  document.getElementById('emojiTab').classList.toggle('hidden',t==='photo');
+  document.getElementById('photoTab').classList.toggle('hidden',t==='emoji');
+  document.getElementById('tabEmoji').classList.toggle('active',t==='emoji');
+  document.getElementById('tabPhoto').classList.toggle('active',t==='photo');
+}
+function selectEmoji(e,i){
+  document.querySelectorAll('.av-opt').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('avopt-'+i).classList.add('selected');
+  selectedEmoji=e;
+}
+
+// Photo file pick
+document.getElementById('avatarFileInput').addEventListener('change',e=>{
+  const file=e.target.files[0]; if(!file) return;
+  if(file.size>2*1024*1024){toast('Max 2MB','error');return}
+  const r=new FileReader();
+  r.onload=ev=>{
+    photoDataUrl=ev.target.result;
+    document.getElementById('photoPreview').src=photoDataUrl;
+    document.getElementById('photoPreviewWrap').classList.remove('hidden');
+    document.getElementById('uploadPhotoBtn').disabled=false;
+  };
+  r.readAsDataURL(file);
+});
+
+async function saveEmojiAvatar(){
+  if(!selectedEmoji){toast('Pick an avatar first','error');return}
+  // Create canvas to render emoji as image
+  const canvas=document.createElement('canvas');canvas.width=200;canvas.height=200;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#18181C';ctx.fillRect(0,0,200,200);
+  ctx.font='120px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(selectedEmoji,100,108);
+  const dataUrl=canvas.toDataURL('image/jpeg',0.9);
+  await sendAvatar(dataUrl);
+}
+async function uploadPhotoAvatar(){
+  if(!photoDataUrl){toast('Choose a photo first','error');return}
+  await sendAvatar(photoDataUrl);
+}
+async function sendAvatar(dataUrl){
+  try{
+    const d=await apiFetch('/api/profile/avatar',{method:'POST',body:JSON.stringify({avatar_data_url:dataUrl})});
+    const av=document.getElementById('avatarDisplay');
+    av.style.backgroundImage=`url('${d.avatar}')`;av.style.backgroundSize='cover';av.textContent='';
+    document.getElementById('removeAvatarBtn').style.display='';
+    const u=Auth.getUser();if(u){u.avatar=d.avatar;Auth.setSession(Auth.getToken(),u)}
+    initSidebar();
+    closeAvatarModal();toast('Avatar updated!','ok');
+  }catch(e){toast(e.message,'error')}
+}
+async function removeAvatar(){
+  if(!confirm('Remove your avatar?')) return;
+  try{
+    await apiFetch('/api/profile/avatar',{method:'DELETE'});
+    const u=Auth.getUser();const av=document.getElementById('avatarDisplay');
+    av.style.backgroundImage='';av.textContent=(u?.username||'?')[0].toUpperCase();
+    document.getElementById('removeAvatarBtn').style.display='none';
+    if(u){delete u.avatar;Auth.setSession(Auth.getToken(),u)}
+    initSidebar();toast('Avatar removed','ok');
+  }catch(e){toast(e.message,'error')}
+}
+
+// Close modal on backdrop click
+document.getElementById('avatarModal').addEventListener('click',e=>{if(e.target===document.getElementById('avatarModal'))closeAvatarModal()});
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dashboard — WatermarkWatch</title>
+<link rel="stylesheet" href="../src/global.css"/>
+<style>
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:20px}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.stat-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.03em}
+.stat-num.green{color:var(--accent)}.stat-num.red{color:var(--red)}.stat-num.amber{color:var(--amber)}.stat-num.blue{color:var(--blue)}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em}
+.scans-table{width:100%;border-collapse:collapse}
+.scans-table th{font-size:11px;color:var(--text3);text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.scans-table td{padding:12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.scans-table tr:last-child td{border-bottom:none}
+.scans-table tr:hover td{background:var(--bg3)}
+.src-cell{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text2)}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px 6px;border-radius:6px;transition:all .15s}
+.del-btn:hover{color:var(--red);background:var(--rdim)}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-state p{font-size:14px;margin-bottom:16px}
+.pagination{display:flex;gap:6px;justify-content:center;margin-top:16px}
+.page-btn{min-width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all .15s}
+.page-btn:hover,.page-btn.active{border-color:var(--accent);color:var(--accent)}
+.page-btn:disabled{opacity:.4;cursor:not-allowed}
+.welcome-banner{background:var(--adim2);border:1px solid rgba(0,229,160,.1);border-radius:var(--rl);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between}
+.welcome-text h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px}
+.welcome-text p{font-size:13px;color:var(--text2)}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/><path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span>WatermarkWatch</span>
+    </div>
+    <a href="dashboard.html" class="nav-item active"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+    <a href="detector.html" class="nav-item"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/><circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 1.5v2M7.5 11.5v2M1.5 7.5h2M11.5 7.5h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Scan Image</a>
+    <a href="account.html" class="nav-item"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 13c0-3.038 2.462-5.5 5.5-5.5S13 9.962 13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Profile</a>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="user-avatar" id="sideAvatar">?</div>
+        <div class="user-info"><div class="user-name" id="sideUsername">…</div><div class="user-plan" id="sidePlan">unlimited</div></div>
+      </div>
+      <button class="nav-item mt-1" style="color:var(--text3)" onclick="logout()"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 13H2a1 1 0 01-1-1V3a1 1 0 011-1h3M10 10l3-3-3-3M14 7.5H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="welcome-banner">
+      <div class="welcome-text">
+        <h2 id="welcomeMsg">Welcome back!</h2>
+        <p>You have <strong style="color:var(--accent)">unlimited</strong> scans available. Start detecting watermarks now.</p>
+      </div>
+      <a href="detector.html" class="btn btn-primary">+ New scan</a>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total scans</div><div class="stat-num blue" id="st-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Watermarks found</div><div class="stat-num red" id="st-wm">—</div></div>
+      <div class="stat-card"><div class="stat-label">Unauthorized</div><div class="stat-num amber" id="st-un">—</div></div>
+      <div class="stat-card"><div class="stat-label">Clean images</div><div class="stat-num green" id="st-cl">—</div></div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-h3">Scan history</div>
+      <span style="font-size:12px;color:var(--text3)" id="totalLabel"></span>
+    </div>
+
+    <div id="emptyState" class="empty-state hidden">
+      <p>No scans yet. Upload your first image to get started.</p>
+      <a href="detector.html" class="btn btn-primary">Scan your first image</a>
+    </div>
+    <table class="scans-table" id="scansTable" style="display:none">
+      <thead><tr><th>Source</th><th>Result</th><th>Agency</th><th>Confidence</th><th>Date</th><th></th></tr></thead>
+      <tbody id="scansBody"></tbody>
+    </table>
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+<div id="toast"></div>
+<script src="../src/utils.js"></script>
+<script>
+if(!Auth.requireAuth()) throw 0;
+initSidebar();
+let pg=1;
+
+async function init(){
+  const u=Auth.getUser();
+  if(u) document.getElementById('welcomeMsg').textContent=`Welcome back, ${u.username}!`;
+  await Promise.all([loadStats(), loadScans(1)]);
+}
+
+async function loadStats(){
+  try{
+    const s=await apiFetch('/api/stats');
+    document.getElementById('st-total').textContent=s.total_scans;
+    document.getElementById('st-wm').textContent=s.watermarks_found;
+    document.getElementById('st-un').textContent=s.unauthorized_uses;
+    document.getElementById('st-cl').textContent=s.clean_images;
+  }catch(e){toast(e.message,'error')}
+}
+
+async function loadScans(page){
+  try{
+    const d=await apiFetch(`/api/scans?page=${page}&per_page=15`);
+    pg=page;
+    document.getElementById('totalLabel').textContent=d.total+' total';
+    const tbody=document.getElementById('scansBody');
+    const table=document.getElementById('scansTable');
+    const empty=document.getElementById('emptyState');
+    if(!d.scans.length&&page===1){table.style.display='none';empty.classList.remove('hidden');document.getElementById('pagination').innerHTML='';return}
+    empty.classList.add('hidden');table.style.display='table';
+    tbody.innerHTML=d.scans.map(s=>{
+      const badge=s.watermark_found?'<span class="badge badge-found">Found</span>':s.possibly_removed?'<span class="badge badge-warn">Maybe removed</span>':'<span class="badge badge-clean">Clean</span>';
+      const ag=s.agency||'<span style="color:var(--text3)">—</span>';
+      const cf=s.watermark_found||s.possibly_removed?`${Math.round((s.confidence||0)*100)}%`:'—';
+      const src=s.source_type==='url'?s.image_source.replace(/^https?:\/\//,'').slice(0,36)+'…':s.image_source;
+      return `<tr><td><span class="src-cell" title="${s.image_source}">${src}</span></td><td>${badge}</td><td>${ag}</td><td style="color:var(--text2)">${cf}</td><td style="color:var(--text3)">${s.scanned_at_fmt}</td><td><button class="del-btn" onclick="delScan('${s.id}')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 3h9M5 3V2h3v1M4 3v7a1 1 0 001 1h3a1 1 0 001-1V3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button></td></tr>`;
+    }).join('');
+    let ph='';
+    if(d.pages>1){
+      ph+=`<button class="page-btn" onclick="loadScans(${page-1})" ${page<=1?'disabled':''}>‹</button>`;
+      for(let i=1;i<=d.pages;i++) ph+=`<button class="page-btn ${i===page?'active':''}" onclick="loadScans(${i})">${i}</button>`;
+      ph+=`<button class="page-btn" onclick="loadScans(${page+1})" ${page>=d.pages?'disabled':''}>›</button>`;
+    }
+    document.getElementById('pagination').innerHTML=ph;
+  }catch(e){toast(e.message,'error')}
+}
+
+async function delScan(id){
+  if(!confirm('Delete this scan?')) return;
+  try{await apiFetch(`/api/scans/${id}`,{method:'DELETE'});toast('Deleted','ok');await Promise.all([loadStats(),loadScans(pg)]);}
+  catch(e){toast(e.message,'error')}
+}
+init();
+</script>
+</body>
+</html>

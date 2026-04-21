@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WatermarkWatch — Sports Media Protection</title>
+<link rel="stylesheet" href="src/global.css"/>
+<style>
+body{display:flex;flex-direction:column;min-height:100vh}
+/* Loader particles */
+.loader-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.particle{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--accent);opacity:0;animation:pfloat var(--d,4s) var(--delay,0s) infinite}
+@keyframes pfloat{0%{opacity:0;transform:translateY(100vh) translateX(0)}10%{opacity:.6}90%{opacity:.3}100%{opacity:0;transform:translateY(-20px) translateX(var(--dx,20px))}}
+
+/* Hero */
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(0,229,160,0.08) 0%,transparent 70%);pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;margin-bottom:24px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:var(--adim3);border:1px solid rgba(0,229,160,.15);padding:5px 14px;border-radius:20px}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+h1{font-family:'Syne',sans-serif;font-size:clamp(38px,7vw,74px);font-weight:800;letter-spacing:-.03em;line-height:1.02;max-width:700px;margin-bottom:20px}
+.accent{color:var(--accent)}
+.sub{font-size:17px;color:var(--text2);max-width:500px;margin-bottom:36px;font-weight:300;line-height:1.7}
+.cta-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+
+/* Stats */
+.stats-row{display:flex;gap:0;margin-top:60px;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;background:var(--bg2)}
+.stat-item{flex:1;padding:20px 24px;text-align:center;border-right:1px solid var(--border)}
+.stat-item:last-child{border-right:none}
+.stat-n{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+.stat-l{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+
+/* Features */
+.features{padding:60px 40px;border-top:1px solid var(--border)}
+.feat-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.feat-h2{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;margin-bottom:36px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:24px;transition:border-color .2s}
+.feat-card:hover{border-color:var(--border3)}
+.feat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:18px}
+.feat-icon.green{background:var(--adim);color:var(--accent)}
+.feat-icon.red{background:var(--rdim);color:var(--red)}
+.feat-icon.blue{background:var(--bdim);color:var(--blue)}
+.feat-icon.amber{background:var(--ydim);color:var(--amber)}
+.feat-icon.purple{background:rgba(138,77,255,.13);color:#a855f7}
+.feat-icon.teal{background:rgba(20,184,166,.13);color:#14b8a6}
+.feat-card h3{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px;letter-spacing:-.01em}
+.feat-card p{font-size:13px;color:var(--text2);line-height:1.65}
+
+footer{padding:22px 40px;border-top:1px solid var(--border);text-align:center;font-size:12px;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-particles" id="particles"></div>
+  <div class="loader-logo">
+    <div class="loader-icon">
+      <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/>
+        <path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    WatermarkWatch
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+    <div class="loader-track"><div class="loader-fill" id="loaderFill"></div></div>
+    <div class="loader-pct" id="loaderPct">0%</div>
+  </div>
+  <div class="loader-msg" id="loaderMsg">Initializing...</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+        <circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/>
+        <path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    WatermarkWatch
+  </div>
+  <div style="display:flex;gap:10px">
+    <a href="pages/login.html" class="btn btn-ghost btn-sm">Sign in</a>
+    <a href="pages/register.html" class="btn btn-primary btn-sm">Get started free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-tag"><div class="pulse"></div> AI-Powered · Sports Media Protection</div>
+  <h1>Detect unauthorized<br><span class="accent">watermarks</span><br>in seconds</h1>
+  <p class="sub">Upload any sports photo. Identify official watermarks from Getty, AP, Reuters and 40+ agencies instantly with AI.</p>
+  <div class="cta-row">
+    <a href="pages/register.html" class="btn btn-primary" style="padding:12px 28px;font-size:14px">Start for free — unlimited scans</a>
+    <a href="pages/login.html" class="btn btn-ghost">Sign in</a>
+  </div>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-n">2.4M+</div><div class="stat-l">Images scanned</div></div>
+    <div class="stat-item"><div class="stat-n">94%</div><div class="stat-l">Accuracy</div></div>
+    <div class="stat-item"><div class="stat-n">&lt;3s</div><div class="stat-l">Avg scan time</div></div>
+    <div class="stat-item"><div class="stat-n">40+</div><div class="stat-l">Agencies</div></div>
+    <div class="stat-item"><div class="stat-n">∞</div><div class="stat-l">Free scans</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="feat-label">Why WatermarkWatch</div>
+  <div class="feat-h2">Everything you need to protect media rights</div>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon green">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M9 2v2M9 14v2M2 9h2M14 9h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <h3>AI-powered detection</h3>
+      <p>Claude Vision AI analyzes every pixel for visible text overlays, corner logos, semi-transparent marks, and removal artifacts.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon red">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L2 6v5c0 3.3 3 6 7 6s7-2.7 7-6V6L9 2z" stroke="currentColor" stroke-width="1.4"/><path d="M6 9l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <h3>40+ agency database</h3>
+      <p>Recognizes marks from Getty Images, AP, Reuters, AFP, Shutterstock, Alamy, Icon Sportswire and dozens more agencies.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon blue">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M6 8h6M6 11h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Detailed reports</h3>
+      <p>Get agency name, confidence score, watermark location with visual highlight, and a plain-English verdict on each scan.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon amber">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v4M9 12v4M2 9h4M12 9h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="9" cy="9" r="3" stroke="currentColor" stroke-width="1.4"/></svg>
+      </div>
+      <h3>Unlimited free scans</h3>
+      <p>No monthly limits, no credit card, no paywalls. Scan as many images as you need, completely free forever.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon purple">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="10" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="10" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+      </div>
+      <h3>Scan history dashboard</h3>
+      <p>Every scan is saved to your personal dashboard with full results, statistics, and agency breakdown charts.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon teal">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Secure accounts</h3>
+      <p>JWT auth, bcrypt passwords, account recovery via birthday and phone. Your data stays private and protected.</p>
+    </div>
+  </div>
+</section>
+
+<footer>© 2025 WatermarkWatch · Built to protect sports media rights · Unlimited free scans</footer>
+
+<div id="toast"></div>
+<script src="src/utils.js"></script>
+<script>
+// Redirect if logged in
+if (Auth.isLoggedIn()) window.location.href = 'pages/dashboard.html';
+
+// ── Generate floating particles ──
+const pWrap = document.getElementById('particles');
+for (let i = 0; i < 30; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.cssText = `left:${Math.random()*100}%;--d:${3+Math.random()*5}s;--delay:${Math.random()*4}s;--dx:${(Math.random()-0.5)*100}px;opacity:0`;
+  pWrap.appendChild(p);
+}
+
+// ── Loader 0→100 ──
+const fill = document.getElementById('loaderFill');
+const pct  = document.getElementById('loaderPct');
+const msg  = document.getElementById('loaderMsg');
+const msgs = ['Initializing...','Loading AI models...','Connecting to database...','Fetching agency data...','Almost ready...','Welcome!'];
+let current = 0;
+const interval = setInterval(() => {
+  current += Math.random() * 4 + 1;
+  if (current > 100) current = 100;
+  fill.style.width = current + '%';
+  pct.textContent  = Math.floor(current) + '%';
+  const idx = Math.min(Math.floor(current / 20), msgs.length - 1);
+  msg.textContent  = msgs[idx];
+  if (current >= 100) {
+    clearInterval(interval);
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+    }, 500);
+  }
+}, 60);
+</script>
+</body>
+</html>

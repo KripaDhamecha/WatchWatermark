@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>WatermarkWatch — Sports Media Protection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/global.css"/>
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .hero {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 60px 24px;
+      background: radial-gradient(ellipse 800px 500px at 50% 30%, rgba(0,229,160,0.05) 0%, transparent 70%);
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px;
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); background: rgba(0,229,160,0.06);
+      border: 1px solid rgba(0,229,160,0.15); padding: 5px 14px; border-radius: 20px;
+    }
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(36px, 7vw, 72px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.02; max-width: 680px; margin-bottom: 20px; }
+    .accent { color: var(--accent); }
+    .sub { font-size: 17px; color: var(--text2); max-width: 480px; margin-bottom: 36px; font-weight: 300; line-height: 1.7; }
+    .cta-row { display: flex; gap: 12px; align-items: center; }
+    .stats { display: flex; gap: 32px; margin-top: 60px; }
+    .st { text-align: center; }
+    .st-num { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+    .st-lab { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+    .st-div { width: 1px; background: var(--border); align-self: stretch; }
+    footer { padding: 20px 40px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--text3); }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/>
+          <path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      WatermarkWatch
+    </div>
+    <div class="nav-right">
+      <a href="pages/login.html"    class="btn btn-ghost btn-sm">Sign in</a>
+      <a href="pages/register.html" class="btn btn-primary btn-sm">Get started free</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-tag">AI-Powered · Sports Media Protection</div>
+    <h1>Detect unauthorized<br><span class="accent">watermarks</span> instantly</h1>
+    <p class="sub">Upload any sports photo. Identify official watermarks from Getty, AP, Reuters and 40+ agencies in under 3 seconds.</p>
+    <div class="cta-row">
+      <a href="pages/register.html" class="btn btn-primary">Start for free</a>
+      <a href="pages/login.html"    class="btn btn-ghost">Sign in</a>
+    </div>
+    <div class="stats">
+      <div class="st"><div class="st-num">2.4M+</div><div class="st-lab">Images scanned</div></div>
+      <div class="st-div"></div>
+      <div class="st"><div class="st-num">94%</div><div class="st-lab">Accuracy</div></div>
+      <div class="st-div"></div>
+      <div class="st"><div class="st-num">&lt;3s</div><div class="st-lab">Avg scan time</div></div>
+      <div class="st-div"></div>
+      <div class="st"><div class="st-num">40+</div><div class="st-lab">Agencies</div></div>
+    </div>
+  </section>
+
+  <footer>© 2025 WatermarkWatch · Built to protect sports media rights</footer>
+
+  <script src="src/utils.js"></script>
+  <script>
+    // Auto-redirect if already logged in
+    if (Auth.isLoggedIn()) window.location.href = 'pages/dashboard.html';
+  </script>
+</body>
+</html>

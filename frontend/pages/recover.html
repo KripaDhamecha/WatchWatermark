@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Account Recovery — WatermarkWatch</title>
+<link rel="stylesheet" href="../src/global.css"/>
+<style>
+body{display:flex;flex-direction:column;min-height:100vh}
+.auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:radial-gradient(ellipse 700px 500px at 50% 0%,rgba(0,229,160,0.05) 0%,transparent 70%)}
+.auth-card{width:100%;max-width:420px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rxl);padding:40px 36px}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.auth-logo span{font-family:'Syne',sans-serif;font-size:17px;font-weight:800}
+h1{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.auth-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.form{display:flex;flex-direction:column;gap:14px}
+.step{display:none}.step.active{display:flex;flex-direction:column;gap:14px}
+.auth-footer{margin-top:20px;text-align:center;font-size:13px;color:var(--text3)}
+.auth-footer a{color:var(--accent)}
+.success-icon{width:56px;height:56px;border-radius:50%;background:var(--adim);border:1px solid rgba(0,229,160,.25);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/><path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span>WatermarkWatch</span>
+    </div>
+
+    <div id="alertBox" class="alert alert-error hidden" style="margin-bottom:14px"></div>
+
+    <!-- Step 1: Verify identity -->
+    <div class="step active" id="step1">
+      <h1>Recover account</h1>
+      <p class="auth-sub" style="margin-bottom:0">Enter the details you registered with</p>
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" type="email" id="recEmail" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone number</label>
+        <input class="form-input" type="tel" id="recPhone" placeholder="+91 98765 43210"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Birthday</label>
+        <input class="form-input" type="date" id="recBirthday"/>
+      </div>
+      <button class="btn btn-primary btn-full" id="verifyBtn" onclick="verifyIdentity()">
+        <span id="verifyLabel">Verify identity</span>
+        <svg id="verifySpin" class="spin hidden" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/><path d="M7 1.5A5.5 5.5 0 0112.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <!-- Step 2: New password -->
+    <div class="step" id="step2">
+      <h1>Set new password</h1>
+      <p class="auth-sub" style="margin-bottom:0">Identity verified. Choose a new password.</p>
+      <div class="form-group">
+        <label class="form-label">New password</label>
+        <input class="form-input" type="password" id="newPw" placeholder="Min. 8 characters"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm password</label>
+        <input class="form-input" type="password" id="confirmPw" placeholder="Repeat password"/>
+      </div>
+      <button class="btn btn-primary btn-full" id="resetBtn" onclick="resetPassword()">
+        <span id="resetLabel">Reset password</span>
+        <svg id="resetSpin" class="spin hidden" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/><path d="M7 1.5A5.5 5.5 0 0112.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <!-- Step 3: Done -->
+    <div class="step" id="step3" style="text-align:center;align-items:center">
+      <div class="success-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="#00E5A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1>Password reset!</h1>
+      <p style="color:var(--text2);font-size:14px">Your password has been updated successfully.</p>
+      <a href="login.html" class="btn btn-primary btn-full">Sign in now</a>
+    </div>
+
+    <div class="auth-footer"><a href="login.html">← Back to login</a></div>
+  </div>
+</div>
+<div id="toast"></div>
+<script src="../src/utils.js"></script>
+<script>
+let recoveryToken = null;
+
+function showStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+}
+function showAlert(m){const el=document.getElementById('alertBox');el.textContent=m;el.classList.remove('hidden')}
+function hideAlert(){document.getElementById('alertBox').classList.add('hidden')}
+
+async function verifyIdentity(){
+  const email=document.getElementById('recEmail').value.trim();
+  const phone=document.getElementById('recPhone').value.trim();
+  const birthday=document.getElementById('recBirthday').value;
+  const btn=document.getElementById('verifyBtn');
+  const lbl=document.getElementById('verifyLabel');
+  const spn=document.getElementById('verifySpin');
+  hideAlert();
+  if(!email||!phone||!birthday) return showAlert('All fields are required.');
+  btn.disabled=true;lbl.textContent='Verifying...';spn.classList.remove('hidden');
+  try{
+    const d=await apiFetch('/api/auth/recover',{method:'POST',body:JSON.stringify({email,phone,birthday})});
+    recoveryToken=d.recovery_token;
+    showStep(2);
+  }catch(e){
+    showAlert(e.message);
+    btn.disabled=false;lbl.textContent='Verify identity';spn.classList.add('hidden');
+  }
+}
+
+async function resetPassword(){
+  const np=document.getElementById('newPw').value;
+  const cp=document.getElementById('confirmPw').value;
+  const btn=document.getElementById('resetBtn');
+  const lbl=document.getElementById('resetLabel');
+  const spn=document.getElementById('resetSpin');
+  hideAlert();
+  if(np!==cp) return showAlert('Passwords do not match.');
+  if(np.length<8) return showAlert('Min 8 characters.');
+  btn.disabled=true;lbl.textContent='Resetting...';spn.classList.remove('hidden');
+  try{
+    await apiFetch('/api/auth/reset-password',{method:'POST',body:JSON.stringify({recovery_token:recoveryToken,new_password:np})});
+    showStep(3);
+  }catch(e){
+    showAlert(e.message);
+    btn.disabled=false;lbl.textContent='Reset password';spn.classList.add('hidden');
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Scan Image — WatermarkWatch</title>
+<link rel="stylesheet" href="../src/global.css"/>
+<style>
+.det-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.col{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:24px;display:flex;flex-direction:column;gap:14px}
+.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r);min-height:180px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:var(--adim2)}
+.upload-inner{text-align:center;padding:28px 20px}
+.upload-icon-wrap{width:48px;height:48px;border-radius:var(--r);background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:var(--text2)}
+.upload-inner h3{font-size:14px;font-weight:500;margin-bottom:4px}
+.upload-inner p{font-size:12px;color:var(--text3);margin-bottom:14px}
+.url-row{display:flex;gap:8px}
+.url-input{flex:1;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 14px;border-radius:var(--r);outline:none;transition:border-color .2s}
+.url-input::placeholder{color:var(--text3)}
+.url-input:focus{border-color:var(--accent)}
+.preview-box{border-radius:var(--r);overflow:hidden;border:1px solid var(--border);min-height:140px;background:var(--bg4);position:relative}
+.preview-box img{width:100%;display:block;max-height:240px;object-fit:contain;background:var(--bg4)}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--accent),transparent);animation:scanMove 1.8s ease-in-out infinite;top:0;box-shadow:0 0 10px var(--accent)}
+@keyframes scanMove{0%,100%{top:0}50%{top:96%}}
+.wmark-box{position:absolute;border:2px solid var(--red);border-radius:4px;box-shadow:0 0 8px rgba(255,77,77,.4);pointer-events:none}
+.results-head{display:flex;align-items:center;justify-content:space-between}
+.results-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em}
+.empty-result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text3);text-align:center;padding:40px 20px}
+.result-rows{display:flex;flex-direction:column}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
+.result-row:last-child{border-bottom:none}
+.row-key{font-size:12px;color:var(--text3)}
+.row-val{font-size:13px;font-weight:500}
+.rv-found{color:var(--red)}.rv-clean{color:var(--accent)}.rv-warn{color:var(--amber)}
+.conf-label-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:8px}
+.conf-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.conf-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .6s}
+.verdict-box{padding:14px;border-radius:var(--r);font-size:13px;line-height:1.6}
+.vf{background:var(--rdim);border:1px solid rgba(255,77,77,.2);color:#ff9090}
+.vc{background:var(--adim);border:1px solid rgba(0,229,160,.2);color:#80ffcc}
+.vw{background:var(--ydim);border:1px solid rgba(245,166,35,.2);color:#ffd080}
+.detail-note{font-size:12px;color:var(--text3);line-height:1.7}
+.unlimited-badge{background:var(--adim);border:1px solid rgba(0,229,160,.15);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--accent);display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-icon"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/><path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>WatermarkWatch</span></div>
+    <a href="dashboard.html" class="nav-item"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+    <a href="detector.html" class="nav-item active"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/><circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 1.5v2M7.5 11.5v2M1.5 7.5h2M11.5 7.5h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Scan Image</a>
+    <a href="account.html" class="nav-item"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 13c0-3.038 2.462-5.5 5.5-5.5S13 9.962 13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Profile</a>
+    <div class="sidebar-bottom">
+      <div class="user-card"><div class="user-avatar" id="sideAvatar">?</div><div class="user-info"><div class="user-name" id="sideUsername">…</div><div class="user-plan" id="sidePlan">unlimited</div></div></div>
+      <button class="nav-item mt-1" style="color:var(--text3)" onclick="logout()"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 13H2a1 1 0 01-1-1V3a1 1 0 011-1h3M10 10l3-3-3-3M14 7.5H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-title">Scan Image</div>
+    <p class="page-sub">Detect watermarks and agency marks in sports images</p>
+    <div class="det-grid">
+      <div class="col">
+        <div class="upload-zone" id="uploadZone">
+          <div class="upload-inner">
+            <div class="upload-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4v12M6 10l6-6 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M3 18v1a2 2 0 002 2h14a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+            <h3>Drop sports image here</h3>
+            <p>JPG, PNG, WebP · Up to 20MB</p>
+            <label class="btn btn-ghost btn-sm" for="fileInput" style="cursor:pointer">Choose file</label>
+            <input type="file" id="fileInput" accept="image/*" hidden/>
+          </div>
+        </div>
+        <div class="url-row">
+          <input class="url-input" type="text" id="urlInput" placeholder="Or paste image URL…"/>
+          <button class="btn btn-primary" id="scanBtn" onclick="doScan()">
+            <span id="scanLabel">Scan</span>
+            <svg id="scanSpin" class="spin hidden" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/><path d="M7 1.5A5.5 5.5 0 0112.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div id="previewWrap" class="hidden">
+          <div class="preview-box" id="previewBox">
+            <img id="previewImg" src="" alt="Preview"/>
+            <div id="scanLine" class="scan-line hidden"></div>
+            <div id="wmarkBox" class="wmark-box hidden"></div>
+          </div>
+        </div>
+        <div class="unlimited-badge">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zM8 7c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" stroke="currentColor" stroke-width="1.3"/></svg>
+          Unlimited scans — scan as many images as you need, for free
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="results-head">
+          <span class="results-title">Analysis Result</span>
+          <span class="badge badge-neutral" id="statusBadge">Awaiting image</span>
+        </div>
+        <div class="empty-result" id="emptyResult">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" opacity=".3"><circle cx="18" cy="18" r="14" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3"/><path d="M12 18h12M18 12v12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <p style="font-size:13px">Upload an image to begin detection</p>
+        </div>
+        <div id="resultData" class="hidden" style="display:flex;flex-direction:column;gap:14px">
+          <div class="result-rows" id="resultRows"></div>
+          <div>
+            <div class="conf-label-row"><span>Confidence</span><span id="confPct">—</span></div>
+            <div class="conf-bar"><div class="conf-fill" id="confFill" style="width:0%"></div></div>
+          </div>
+          <div class="verdict-box" id="verdictBox"></div>
+          <p class="detail-note" id="detailNote"></p>
+        </div>
+        <div id="errorResult" class="hidden"><p style="color:var(--red);font-size:13px" id="errorMsg"></p></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div id="toast"></div>
+<script src="../src/utils.js"></script>
+<script>
+if(!Auth.requireAuth()) throw 0;
+initSidebar();
+let selFile=null;
+
+const zone=document.getElementById('uploadZone');
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over')});
+zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f?.type.startsWith('image/'))loadFile(f)});
+zone.addEventListener('click',()=>document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0])});
+
+function loadFile(f){selFile=f;const r=new FileReader();r.onload=e=>{showPreview(e.target.result);resetResult()};r.readAsDataURL(f)}
+function showPreview(src){document.getElementById('previewImg').src=src;document.getElementById('previewWrap').classList.remove('hidden');document.getElementById('wmarkBox').classList.add('hidden');document.getElementById('scanLine').classList.add('hidden')}
+document.getElementById('urlInput').addEventListener('keydown',e=>{if(e.key==='Enter')doScan()});
+
+async function doScan(){
+  const urlVal=document.getElementById('urlInput').value.trim();
+  if(!selFile&&!urlVal){toast('Upload an image or paste a URL','error');return}
+  const btn=document.getElementById('scanBtn');const lbl=document.getElementById('scanLabel');const spn=document.getElementById('scanSpin');
+  btn.disabled=true;lbl.textContent='Scanning…';spn.classList.remove('hidden');
+  document.getElementById('scanLine').classList.remove('hidden');resetResult();
+  if(!selFile&&urlVal){document.getElementById('previewImg').src=urlVal;document.getElementById('previewWrap').classList.remove('hidden')}
+  try{
+    let data;
+    if(selFile){const form=new FormData();form.append('image',selFile);data=await apiFetch('/api/detect',{method:'POST',body:form})}
+    else data=await apiFetch('/api/detect',{method:'POST',body:JSON.stringify({image_url:urlVal})});
+    showResult(data);
+  }catch(e){
+    document.getElementById('errorMsg').textContent=e.message;
+    document.getElementById('errorResult').classList.remove('hidden');
+    document.getElementById('emptyResult').classList.add('hidden');
+  }finally{
+    btn.disabled=false;lbl.textContent='Scan';spn.classList.add('hidden');
+    document.getElementById('scanLine').classList.add('hidden');
+  }
+}
+
+function showResult(d){
+  document.getElementById('emptyResult').classList.add('hidden');
+  document.getElementById('errorResult').classList.add('hidden');
+  document.getElementById('resultData').classList.remove('hidden');
+  document.getElementById('resultData').style.display='flex';
+  const badge=document.getElementById('statusBadge');
+  if(d.watermark_found){badge.className='badge badge-found';badge.textContent='Watermark found'}
+  else if(d.possibly_removed){badge.className='badge badge-warn';badge.textContent='Possibly removed'}
+  else{badge.className='badge badge-clean';badge.textContent='No watermark'}
+  const rows=[['Watermark found',d.watermark_found?'Yes':'No',d.watermark_found?'rv-found':'rv-clean'],['Agency',d.agency||'—',''],['Type',d.type||'—',''],['Location',d.location||'—',''],['Unauthorized',d.unauthorized?'Likely yes':'Unlikely',d.unauthorized?'rv-found':'rv-clean']];
+  document.getElementById('resultRows').innerHTML=rows.map(([k,v,c])=>`<div class="result-row"><span class="row-key">${k}</span><span class="row-val ${c}">${v}</span></div>`).join('');
+  const p=Math.round((d.confidence||0)*100);
+  document.getElementById('confFill').style.width=p+'%';document.getElementById('confPct').textContent=p+'%';
+  const vb=document.getElementById('verdictBox');
+  vb.className='verdict-box '+(d.watermark_found?'vf':d.possibly_removed?'vw':'vc');
+  vb.textContent=d.verdict||'';
+  document.getElementById('detailNote').textContent=d.notes||'';
+  if(d.region&&selFile){const r=d.region,box=document.getElementById('wmarkBox');box.style.top=r.top+'%';box.style.left=r.left+'%';box.style.width=r.width+'%';box.style.height=r.height+'%';box.classList.remove('hidden')}
+}
+
+function resetResult(){document.getElementById('emptyResult').classList.remove('hidden');document.getElementById('resultData').classList.add('hidden');document.getElementById('resultData').style.display='none';document.getElementById('errorResult').classList.add('hidden');document.getElementById('statusBadge').className='badge badge-neutral';document.getElementById('statusBadge').textContent='Awaiting image'}
+</script>
+</body>
+</html>

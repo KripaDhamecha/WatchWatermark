@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Create Account — WatermarkWatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/global.css"/>
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .auth-wrap {
+      flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px;
+      background: radial-gradient(ellipse 700px 500px at 50% 0%, rgba(0,229,160,0.04) 0%, transparent 70%);
+    }
+    .auth-card {
+      width: 100%; max-width: 420px;
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-xl);
+      padding: 40px 36px;
+    }
+    .auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
+    .auth-logo span { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
+    h1 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .auth-sub { font-size: 14px; color: var(--text2); margin-bottom: 28px; }
+    .form { display: flex; flex-direction: column; gap: 16px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .auth-footer { margin-top: 24px; text-align: center; font-size: 13px; color: var(--text3); }
+    .auth-footer a { color: var(--accent); }
+    .alert { padding: 11px 14px; border-radius: var(--radius); font-size: 13px; margin-bottom: 4px; }
+    .alert-error { background: var(--rdim); border: 1px solid rgba(255,77,77,0.2); color: var(--red); }
+    .plan-note {
+      background: var(--adim2); border: 1px solid rgba(0,229,160,0.12);
+      border-radius: var(--radius); padding: 12px 14px;
+      font-size: 12px; color: var(--text2); line-height: 1.6;
+    }
+    .plan-note strong { color: var(--accent); }
+    .strength-bar { height: 3px; border-radius: 2px; background: var(--bg4); margin-top: 6px; overflow: hidden; }
+    .strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0; }
+  </style>
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon">
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/>
+            <path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span>WatermarkWatch</span>
+      </div>
+
+      <h1>Create your account</h1>
+      <p class="auth-sub">Start detecting watermarks for free</p>
+
+      <div id="alertBox" class="alert alert-error hidden"></div>
+
+      <div class="form">
+        <div class="two-col">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <input class="form-input" type="text" id="username" placeholder="johndoe" autocomplete="username"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" id="email" placeholder="you@example.com"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" id="password" placeholder="Min. 8 characters" id="password" oninput="checkStrength(this.value)"/>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <span class="form-hint" id="strengthLabel"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm password</label>
+          <input class="form-input" type="password" id="confirm" placeholder="Repeat password"/>
+        </div>
+        <div class="plan-note">
+          Free plan includes <strong>10 scans/month</strong>. No credit card required.
+        </div>
+        <button class="btn btn-primary btn-full" id="regBtn" onclick="doRegister()">
+          <span id="regLabel">Create account</span>
+          <svg id="regSpin" class="spin hidden" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="5.5" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+            <path d="M7 1.5A5.5 5.5 0 0112.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <script src="../src/utils.js"></script>
+  <script>
+    if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+
+    function checkStrength(pw) {
+      const fill  = document.getElementById('strengthFill');
+      const label = document.getElementById('strengthLabel');
+      let score = 0;
+      if (pw.length >= 8)  score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      const levels = [
+        { w: '0%',   bg: 'transparent', t: '' },
+        { w: '30%',  bg: '#FF4D4D',     t: 'Weak' },
+        { w: '55%',  bg: '#F5A623',     t: 'Fair' },
+        { w: '80%',  bg: '#00E5A0',     t: 'Good' },
+        { w: '100%', bg: '#00E5A0',     t: 'Strong' },
+      ];
+      fill.style.width      = levels[score].w;
+      fill.style.background = levels[score].bg;
+      label.textContent     = levels[score].t;
+      label.style.color     = levels[score].bg;
+    }
+
+    async function doRegister() {
+      const username = document.getElementById('username').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm  = document.getElementById('confirm').value;
+      const btn      = document.getElementById('regBtn');
+      const label    = document.getElementById('regLabel');
+      const spin     = document.getElementById('regSpin');
+
+      document.getElementById('alertBox').classList.add('hidden');
+
+      if (!username || !email || !password)  return showAlert('All fields are required.');
+      if (password !== confirm)              return showAlert('Passwords do not match.');
+      if (password.length < 8)              return showAlert('Password must be at least 8 characters.');
+
+      btn.disabled = true;
+      label.textContent = 'Creating account...';
+      spin.classList.remove('hidden');
+
+      try {
+        const data = await apiFetch('/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({ username, email, password })
+        });
+        Auth.setSession(data.token, data.user);
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        showAlert(err.message);
+        btn.disabled = false;
+        label.textContent = 'Create account';
+        spin.classList.add('hidden');
+      }
+    }
+
+    function showAlert(msg) {
+      const el = document.getElementById('alertBox');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

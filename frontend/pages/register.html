@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Create Account — WatermarkWatch</title>
+<link rel="stylesheet" href="../src/global.css"/>
+<style>
+body{display:flex;flex-direction:column;min-height:100vh;background:var(--bg)}
+.auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;background:radial-gradient(ellipse 700px 500px at 50% 0%,rgba(0,229,160,0.05) 0%,transparent 70%)}
+.auth-card{width:100%;max-width:480px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rxl);padding:40px 36px}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.auth-logo span{font-family:'Syne',sans-serif;font-size:17px;font-weight:800}
+h1{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.auth-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.form{display:flex;flex-direction:column;gap:14px}
+.section-divider{display:flex;align-items:center;gap:10px;margin:4px 0}
+.section-divider span{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.recovery-note{background:var(--bdim);border:1px solid rgba(77,166,255,.15);border-radius:var(--r);padding:12px 14px;font-size:12px;color:#7bbfff;line-height:1.6}
+.recovery-note strong{color:var(--blue)}
+.strength-bar{height:3px;border-radius:2px;background:var(--bg4);margin-top:6px;overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
+.auth-footer{margin-top:20px;text-align:center;font-size:13px;color:var(--text3)}
+.auth-footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon"><svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/><path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span>WatermarkWatch</span>
+    </div>
+    <h1>Create your account</h1>
+    <p class="auth-sub">Unlimited scans · No credit card · Free forever</p>
+
+    <div id="alertBox" class="alert alert-error hidden"></div>
+
+    <div class="form">
+      <!-- Basic info -->
+      <div class="two-col">
+        <div class="form-group">
+          <label class="form-label">Full name</label>
+          <input class="form-input" type="text" id="full_name" placeholder="John Doe"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Username *</label>
+          <input class="form-input" type="text" id="username" placeholder="johndoe"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email address *</label>
+        <input class="form-input" type="email" id="email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <input class="form-input" type="password" id="password" placeholder="Min. 8 characters" oninput="checkStrength(this.value)"/>
+        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+        <span class="form-hint" id="strengthLabel"></span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm password *</label>
+        <input class="form-input" type="password" id="confirm" placeholder="Repeat password"/>
+      </div>
+
+      <!-- Account recovery section -->
+      <div class="section-divider"><span>Account recovery info</span></div>
+      <div class="recovery-note">
+        <strong>Why we ask this:</strong> Your phone number and birthday are used <em>only</em> for account recovery if you forget your password. They are never shared or used for marketing.
+      </div>
+      <div class="two-col">
+        <div class="form-group">
+          <label class="form-label">Phone number *</label>
+          <input class="form-input" type="tel" id="phone" placeholder="+91 98765 43210"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Birthday *</label>
+          <input class="form-input" type="date" id="birthday"/>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="regBtn" onclick="doRegister()">
+        <span id="regLabel">Create account — it's free</span>
+        <svg id="regSpin" class="spin hidden" width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="5.5" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+          <path d="M7 1.5A5.5 5.5 0 0112.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="auth-footer">Already have an account? <a href="login.html">Sign in</a></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="../src/utils.js"></script>
+<script>
+if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+
+function checkStrength(pw) {
+  const fill = document.getElementById('strengthFill');
+  const lbl  = document.getElementById('strengthLabel');
+  let s = 0;
+  if (pw.length >= 8)          s++;
+  if (/[A-Z]/.test(pw))        s++;
+  if (/[0-9]/.test(pw))        s++;
+  if (/[^A-Za-z0-9]/.test(pw)) s++;
+  const lvl = [
+    {w:'0%',  bg:'transparent',t:''},
+    {w:'28%', bg:'#FF4D4D',    t:'Weak'},
+    {w:'55%', bg:'#F5A623',    t:'Fair'},
+    {w:'80%', bg:'#00E5A0',    t:'Good'},
+    {w:'100%',bg:'#00E5A0',    t:'Strong ✓'},
+  ];
+  fill.style.width = lvl[s].w; fill.style.background = lvl[s].bg;
+  lbl.textContent = lvl[s].t; lbl.style.color = lvl[s].bg;
+}
+
+async function doRegister() {
+  const full_name= document.getElementById('full_name').value.trim();
+  const username = document.getElementById('username').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const confirm  = document.getElementById('confirm').value;
+  const phone    = document.getElementById('phone').value.trim();
+  const birthday = document.getElementById('birthday').value;
+  const btn = document.getElementById('regBtn');
+  const lbl = document.getElementById('regLabel');
+  const spn = document.getElementById('regSpin');
+
+  document.getElementById('alertBox').classList.add('hidden');
+  if (!username||!email||!password) return showAlert('Username, email and password are required.');
+  if (password !== confirm)          return showAlert('Passwords do not match.');
+  if (password.length < 8)          return showAlert('Password must be at least 8 characters.');
+  if (!phone)                        return showAlert('Phone number is required for account recovery.');
+  if (!birthday)                     return showAlert('Birthday is required for account recovery.');
+
+  btn.disabled=true; lbl.textContent='Creating account...'; spn.classList.remove('hidden');
+  try {
+    const data = await apiFetch('/api/auth/register',{method:'POST',body:JSON.stringify({full_name,username,email,password,phone,birthday})});
+    Auth.setSession(data.token, data.user);
+    window.location.href = 'dashboard.html';
+  } catch(e) {
+    showAlert(e.message);
+    btn.disabled=false; lbl.textContent='Create account — it\'s free'; spn.classList.add('hidden');
+  }
+}
+function showAlert(m){const el=document.getElementById('alertBox');el.textContent=m;el.classList.remove('hidden')}
+</script>
+</body>
+</html>

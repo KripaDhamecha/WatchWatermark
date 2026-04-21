@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Dashboard — WatermarkWatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/global.css"/>
+  <style>
+    .layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    /* Sidebar */
+    .sidebar {
+      background: var(--bg2); border-right: 1px solid var(--border);
+      padding: 24px 16px; display: flex; flex-direction: column; gap: 4px;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+    .sidebar-logo { display: flex; align-items: center; gap: 8px; padding: 4px 8px 20px; }
+    .sidebar-logo span { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+      border-radius: var(--radius); font-size: 13px; color: var(--text2);
+      cursor: pointer; transition: all 0.15s; border: none; background: none; width: 100%; text-align: left;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: var(--adim); color: var(--accent); }
+    .nav-item svg { flex-shrink: 0; }
+    .sidebar-bottom { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+    .user-card {
+      display: flex; align-items: center; gap: 10px; padding: 10px;
+      border-radius: var(--radius); background: var(--bg3);
+    }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--adim); border: 1px solid rgba(0,229,160,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--accent);
+      flex-shrink: 0;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name  { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-plan  { font-size: 11px; color: var(--text3); }
+    /* Main content */
+    .main { padding: 32px 36px; overflow-x: hidden; }
+    .page-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .page-sub   { font-size: 14px; color: var(--text2); margin-bottom: 28px; }
+    /* Stats grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px;
+    }
+    .stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .stat-num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -0.03em; }
+    .stat-num.accent { color: var(--accent); }
+    .stat-num.red    { color: var(--red); }
+    .stat-num.amber  { color: var(--amber); }
+    /* Progress */
+    .usage-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 28px; }
+    .usage-row  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .usage-bar  { height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+    .usage-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width 0.6s; }
+    /* Table */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .section-h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+    .scans-table { width: 100%; border-collapse: collapse; }
+    .scans-table th {
+      font-size: 11px; color: var(--text3); text-align: left; padding: 8px 12px;
+      border-bottom: 1px solid var(--border); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .scans-table td { padding: 12px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+    .scans-table tr:last-child td { border-bottom: none; }
+    .scans-table tr:hover td { background: var(--bg3); }
+    .source-cell { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text2); }
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
+    .empty-state p { font-size: 14px; margin-bottom: 16px; }
+    .delete-btn {
+      background: none; border: none; cursor: pointer; color: var(--text3);
+      padding: 4px 6px; border-radius: 6px; transition: all 0.15s;
+    }
+    .delete-btn:hover { color: var(--red); background: var(--rdim); }
+    .pagination { display: flex; gap: 6px; justify-content: center; margin-top: 20px; }
+    .page-btn {
+      min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 12px; cursor: pointer; border: 1px solid var(--border);
+      background: var(--bg3); color: var(--text2); transition: all 0.15s;
+    }
+    .page-btn:hover, .page-btn.active { border-color: var(--accent); color: var(--accent); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/>
+          <path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span>WatermarkWatch</span>
+    </div>
+
+    <a href="dashboard.html" class="nav-item active">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+      Dashboard
+    </a>
+    <a href="detector.html" class="nav-item">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/><circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 1.5v2M7.5 11.5v2M1.5 7.5h2M11.5 7.5h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Scan Image
+    </a>
+    <a href="account.html" class="nav-item">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 13c0-3.038 2.462-5.5 5.5-5.5S13 9.962 13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Account
+    </a>
+
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="user-avatar" id="sideAvatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sideUsername">Loading...</div>
+          <div class="user-plan" id="sidePlan">free plan</div>
+        </div>
+      </div>
+      <button class="nav-item mt-1" style="color:var(--text3)" onclick="logout()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 13H2a1 1 0 01-1-1V3a1 1 0 011-1h3M10 10l3-3-3-3M14 7.5H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-title">Dashboard</div>
+    <p class="page-sub" id="welcomeMsg">Welcome back!</p>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-label">Total scans</div><div class="stat-num" id="st-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Watermarks found</div><div class="stat-num red" id="st-wmarks">—</div></div>
+      <div class="stat-card"><div class="stat-label">Unauthorized</div><div class="stat-num amber" id="st-unauth">—</div></div>
+      <div class="stat-card"><div class="stat-label">Clean images</div><div class="stat-num accent" id="st-clean">—</div></div>
+    </div>
+
+    <!-- Usage bar -->
+    <div class="usage-card">
+      <div class="usage-row">
+        <span style="font-size:13px;font-weight:500">Monthly scans</span>
+        <span style="font-size:13px;color:var(--text2)" id="usageLabel">— / —</span>
+      </div>
+      <div class="usage-bar"><div class="usage-fill" id="usageFill" style="width:0%"></div></div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text3)" id="usageNote"></div>
+    </div>
+
+    <!-- Scan history -->
+    <div class="section-header">
+      <div class="section-h3">Recent scans</div>
+      <a href="detector.html" class="btn btn-primary btn-sm">+ New scan</a>
+    </div>
+
+    <div id="tableWrap">
+      <div class="empty-state" id="emptyState" style="display:none">
+        <p>No scans yet. Start by uploading a sports image.</p>
+        <a href="detector.html" class="btn btn-primary">Scan your first image</a>
+      </div>
+      <table class="scans-table" id="scansTable" style="display:none">
+        <thead>
+          <tr>
+            <th>Source</th>
+            <th>Result</th>
+            <th>Agency</th>
+            <th>Confidence</th>
+            <th>Date</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="scansBody"></tbody>
+      </table>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+<script src="../src/utils.js"></script>
+<script>
+  if (!Auth.requireAuth()) throw new Error('redirect');
+
+  let currentPage = 1;
+
+  async function init() {
+    const user = Auth.getUser();
+    if (user) {
+      document.getElementById('sideAvatar').textContent   = user.username[0].toUpperCase();
+      document.getElementById('sideUsername').textContent = user.username;
+      document.getElementById('sidePlan').textContent     = user.plan + ' plan';
+      document.getElementById('welcomeMsg').textContent   = `Welcome back, ${user.username}!`;
+    }
+    await Promise.all([loadStats(), loadScans(1)]);
+  }
+
+  async function loadStats() {
+    try {
+      const s = await apiFetch('/api/stats');
+      document.getElementById('st-total').textContent  = s.total_scans;
+      document.getElementById('st-wmarks').textContent = s.watermarks_found;
+      document.getElementById('st-unauth').textContent = s.unauthorized_uses;
+      document.getElementById('st-clean').textContent  = s.clean_images;
+      const pct = s.scans_limit > 0 ? Math.round((s.scans_used / s.scans_limit) * 100) : 0;
+      document.getElementById('usageFill').style.width = pct + '%';
+      document.getElementById('usageLabel').textContent = `${s.scans_used} / ${s.scans_limit}`;
+      const rem = s.scans_limit - s.scans_used;
+      document.getElementById('usageNote').textContent =
+        rem > 0 ? `${rem} scans remaining this month` : 'Scan limit reached. Upgrade for more.';
+      if (rem <= 0) document.getElementById('usageFill').style.background = 'var(--red)';
+    } catch(e) { toast(e.message, 'error'); }
+  }
+
+  async function loadScans(page) {
+    try {
+      const data = await apiFetch(`/api/scans?page=${page}&per_page=15`);
+      currentPage = page;
+      const tbody = document.getElementById('scansBody');
+      const table = document.getElementById('scansTable');
+      const empty = document.getElementById('emptyState');
+
+      if (data.scans.length === 0 && page === 1) {
+        table.style.display = 'none';
+        empty.style.display = 'block';
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+      empty.style.display = 'none';
+      table.style.display = 'table';
+
+      tbody.innerHTML = data.scans.map(s => {
+        const badge = s.watermark_found ? '<span class="badge badge-found">Found</span>'
+                    : s.possibly_removed ? '<span class="badge badge-warn">Maybe removed</span>'
+                    : '<span class="badge badge-clean">Clean</span>';
+        const agency = s.agency || '<span style="color:var(--text3)">—</span>';
+        const conf   = s.watermark_found || s.possibly_removed
+                     ? `<span style="color:var(--text2)">${Math.round((s.confidence||0)*100)}%</span>` : '—';
+        const srcName = s.source_type === 'url'
+                      ? s.image_source.replace(/^https?:\/\//, '').slice(0, 40) + '…'
+                      : s.image_source;
+        return `<tr>
+          <td><span class="source-cell" title="${s.image_source}">${srcName}</span></td>
+          <td>${badge}</td>
+          <td>${agency}</td>
+          <td>${conf}</td>
+          <td style="color:var(--text3)">${s.scanned_at_fmt}</td>
+          <td><button class="delete-btn" onclick="deleteScan('${s.id}')" title="Delete">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M2 3h9M5 3V2h3v1M4 3v7a1 1 0 001 1h3a1 1 0 001-1V3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </button></td>
+        </tr>`;
+      }).join('');
+
+      // Pagination
+      const pages = data.pages;
+      let pHtml = '';
+      if (pages > 1) {
+        pHtml += `<button class="page-btn" onclick="loadScans(${page-1})" ${page<=1?'disabled':''}>‹</button>`;
+        for (let i = 1; i <= pages; i++) {
+          pHtml += `<button class="page-btn ${i===page?'active':''}" onclick="loadScans(${i})">${i}</button>`;
+        }
+        pHtml += `<button class="page-btn" onclick="loadScans(${page+1})" ${page>=pages?'disabled':''}>›</button>`;
+      }
+      document.getElementById('pagination').innerHTML = pHtml;
+
+    } catch(e) { toast(e.message, 'error'); }
+  }
+
+  async function deleteScan(id) {
+    if (!confirm('Delete this scan record?')) return;
+    try {
+      await apiFetch(`/api/scans/${id}`, { method: 'DELETE' });
+      toast('Scan deleted', 'ok');
+      await Promise.all([loadStats(), loadScans(currentPage)]);
+    } catch(e) { toast(e.message, 'error'); }
+  }
+
+  init();
+</script>
+</body>
+</html>

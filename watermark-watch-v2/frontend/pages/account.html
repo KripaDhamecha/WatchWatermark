@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Account — WatermarkWatch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/global.css"/>
+  <style>
+    .layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    .sidebar { background: var(--bg2); border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .sidebar-logo { display: flex; align-items: center; gap: 8px; padding: 4px 8px 20px; }
+    .sidebar-logo span { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); font-size: 13px; color: var(--text2); cursor: pointer; transition: all 0.15s; border: none; background: none; width: 100%; text-align: left; text-decoration: none; }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: var(--adim); color: var(--accent); }
+    .sidebar-bottom { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--radius); background: var(--bg3); }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--adim); border: 1px solid rgba(0,229,160,0.2); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+    .user-name  { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-plan  { font-size: 11px; color: var(--text3); }
+    .user-info  { flex: 1; min-width: 0; }
+    /* Main */
+    .main { padding: 32px 36px; max-width: 640px; }
+    .page-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .page-sub   { font-size: 14px; color: var(--text2); margin-bottom: 32px; }
+    /* Profile card */
+    .profile-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px; }
+    .profile-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .profile-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--adim); border: 1px solid rgba(0,229,160,0.25); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--accent); }
+    .profile-name { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
+    .profile-email { font-size: 13px; color: var(--text3); }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .info-item { background: var(--bg3); border-radius: var(--radius); padding: 14px; }
+    .info-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+    .info-val { font-size: 15px; font-weight: 500; }
+    /* Section heading */
+    .section-h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 14px; }
+    .alert { padding: 10px 14px; border-radius: var(--radius); font-size: 13px; margin-bottom: 14px; }
+    .alert-error   { background: var(--rdim);  border: 1px solid rgba(255,77,77,0.2);  color: var(--red); }
+    .alert-success { background: var(--adim);  border: 1px solid rgba(0,229,160,0.2);  color: var(--accent); }
+    .pw-form { display: flex; flex-direction: column; gap: 14px; }
+    .danger-zone { background: var(--bg2); border: 1px solid rgba(255,77,77,0.2); border-radius: var(--radius-lg); padding: 20px; margin-top: 8px; }
+    .danger-zone p { font-size: 13px; color: var(--text2); margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><svg width="14" height="14" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#00E5A0" stroke-width="1.5"/><path d="M5 9l3 3 5-5" stroke="#00E5A0" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span>WatermarkWatch</span>
+    </div>
+    <a href="dashboard.html" class="nav-item"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+    <a href="detector.html" class="nav-item"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/><circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M7.5 1.5v2M7.5 11.5v2M1.5 7.5h2M11.5 7.5h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Scan Image</a>
+    <a href="account.html" class="nav-item active"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 13c0-3.038 2.462-5.5 5.5-5.5S13 9.962 13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Account</a>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="user-avatar" id="sideAvatar">?</div>
+        <div class="user-info"><div class="user-name" id="sideUsername">…</div><div class="user-plan" id="sidePlan">free plan</div></div>
+      </div>
+      <button class="nav-item mt-1" style="color:var(--text3)" onclick="logout()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 13H2a1 1 0 01-1-1V3a1 1 0 011-1h3M10 10l3-3-3-3M14 7.5H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-title">Account</div>
+    <p class="page-sub">Manage your profile and security settings</p>
+
+    <!-- Profile info -->
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <div>
+          <div class="profile-name" id="profileName">—</div>
+          <div class="profile-email" id="profileEmail">—</div>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item"><div class="info-label">Plan</div><div class="info-val" id="profilePlan">—</div></div>
+        <div class="info-item"><div class="info-label">Member since</div><div class="info-val" id="profileSince">—</div></div>
+        <div class="info-item"><div class="info-label">Scans used</div><div class="info-val" id="profileUsed">—</div></div>
+        <div class="info-item"><div class="info-label">Scans remaining</div><div class="info-val" id="profileRem">—</div></div>
+      </div>
+    </div>
+
+    <!-- Change password -->
+    <div class="profile-card">
+      <div class="section-h3">Change password</div>
+      <div id="pwAlert" class="alert hidden"></div>
+      <div class="pw-form">
+        <div class="form-group">
+          <label class="form-label">Current password</label>
+          <input class="form-input" type="password" id="oldPw" placeholder="Enter current password"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">New password</label>
+          <input class="form-input" type="password" id="newPw" placeholder="Min. 8 characters"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm new password</label>
+          <input class="form-input" type="password" id="confirmPw" placeholder="Repeat new password"/>
+        </div>
+        <button class="btn btn-primary" id="pwBtn" onclick="changePassword()">
+          <span id="pwLabel">Update password</span>
+          <svg id="pwSpin" class="spin hidden" width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="5.5" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+            <path d="M7 1.5A5.5 5.5 0 0112.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Danger zone -->
+    <div class="danger-zone">
+      <div class="section-h3" style="color:var(--red)">Danger zone</div>
+      <p>Sign out from all devices by logging out now. Your data and scan history will be preserved.</p>
+      <button class="btn btn-danger" onclick="logout()">Sign out</button>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+<script src="../src/utils.js"></script>
+<script>
+  if (!Auth.requireAuth()) throw new Error('redirect');
+
+  async function init() {
+    try {
+      const user = await apiFetch('/api/auth/me');
+      Auth.setSession(Auth.getToken(), user);
+
+      document.getElementById('sideAvatar').textContent   = user.username[0].toUpperCase();
+      document.getElementById('sideUsername').textContent = user.username;
+      document.getElementById('sidePlan').textContent     = user.plan + ' plan';
+      document.getElementById('profileAvatar').textContent = user.username[0].toUpperCase();
+      document.getElementById('profileName').textContent  = user.username;
+      document.getElementById('profileEmail').textContent = user.email;
+      document.getElementById('profilePlan').textContent  = user.plan.charAt(0).toUpperCase() + user.plan.slice(1);
+      document.getElementById('profileSince').textContent = user.member_since;
+      document.getElementById('profileUsed').textContent  = user.scans_used;
+      document.getElementById('profileRem').textContent   = user.scans_remaining;
+    } catch(e) { toast(e.message, 'error'); }
+  }
+
+  async function changePassword() {
+    const oldPw   = document.getElementById('oldPw').value;
+    const newPw   = document.getElementById('newPw').value;
+    const confirm = document.getElementById('confirmPw').value;
+    const btn     = document.getElementById('pwBtn');
+    const label   = document.getElementById('pwLabel');
+    const spin    = document.getElementById('pwSpin');
+    const alert   = document.getElementById('pwAlert');
+
+    alert.classList.add('hidden');
+    if (!oldPw || !newPw || !confirm) return showPwAlert('All fields required.', 'error');
+    if (newPw !== confirm)            return showPwAlert('New passwords do not match.', 'error');
+    if (newPw.length < 8)            return showPwAlert('New password must be at least 8 characters.', 'error');
+
+    btn.disabled = true; label.textContent = 'Updating…'; spin.classList.remove('hidden');
+    try {
+      await apiFetch('/api/auth/change-password', { method: 'POST', body: JSON.stringify({ old_password: oldPw, new_password: newPw }) });
+      showPwAlert('Password updated successfully!', 'success');
+      document.getElementById('oldPw').value = '';
+      document.getElementById('newPw').value = '';
+      document.getElementById('confirmPw').value = '';
+    } catch(e) {
+      showPwAlert(e.message, 'error');
+    } finally {
+      btn.disabled = false; label.textContent = 'Update password'; spin.classList.add('hidden');
+    }
+  }
+
+  function showPwAlert(msg, type) {
+    const el = document.getElementById('pwAlert');
+    el.textContent = msg;
+    el.className = `alert alert-${type}`;
+    el.classList.remove('hidden');
+  }
+
+  init();
+</script>
+</body>
+</html>
